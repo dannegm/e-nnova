@@ -12,11 +12,13 @@
       </thead>
       <tbody>
         <tr v-for="item in items">
-          <th>
-            <span v-if="!item.vote" class="has-text-danger">
+          <th v-if="!item.vote">
+            <span class="has-text-danger">
               <i class="fa fa-times"></i>
             </span>
-            <span v-if="item.vote" class="has-text-success">
+          </th>
+          <th v-if="item.vote">
+            <span class="has-text-success">
               <i class="fa fa-check"></i>
             </span>
           </th>
@@ -44,7 +46,7 @@
 import { database } from '@/services/firebase';
 export default {
   name: 'List',
-  props: ['items'],
+  props: ['items', 'isEmpty'],
   methods: {
     deleteItem (uuid) {
       return database.ref (`test/${uuid}`).remove ();

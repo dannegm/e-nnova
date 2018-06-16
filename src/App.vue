@@ -10,16 +10,16 @@
               title="Totales"
               subtitle="Gráfica de votantes contra no votantes">
               
-              <PieChart v-if="testResults.length > 0"
+              <PieChart v-if="showInfo"
                 :chartData="pieData"
                 :options="pieOptions">
               </PieChart>
 
-              <div v-if="testResults.length == 0" class="notification is-info">
+              <div v-if="!showInfo" class="notification is-info">
                 Se necesitan datos para visualizar la gráfica
               </div>
 
-              <div v-if="testResults.length > 0">
+              <div v-if="showInfo">
                 <span class="tag is-success">{{votesData [0]}}</span>&nbsp;
                 <span class="tag is-danger">{{votesData [1]}}</span>
                 <br /><br />
@@ -56,6 +56,7 @@ import Vue from 'vue';
 import { database } from '@/services/firebase';
 import uuid from 'uuid/v1';
 import moment from 'moment';
+import { isEmpty } from 'lodash';
 
 import { Pie, mixins } from 'vue-chartjs';
 
@@ -106,23 +107,29 @@ export default {
   },
   mounted () {
     database.ref ('test/').on ('value', results => {
-      const res = Object.values (results.val ()).map (i => ({
-        uuid: i.uuid,
-        date: moment (i.timestamp).format (),
-        vote: i.vote,
-      }));
+      this.showInfo = !isEmpty (results.val ());
 
-      this.testResults = res;
+      if (this.showInfo) {
+        let res = Object.values (results.val ()).map (i => ({
+          uuid: i.uuid,
+          date: moment (i.timestamp).format (),
+          vote: i.vote,
+        }));
 
-      const voted = res.filter (i => i.vote);
-      const unvoted = res.filter (i => !i.vote);
-      this.votesData = [ voted.length, unvoted.length ];
-      this.fillChart ();
+        const voted = res.filter (i => i.vote);
+        const unvoted = res.filter (i => !i.vote);
+        this.votesData = [ voted.length, unvoted.length ];
+        this.fillChart ();
+        this.testResults = res;
+      } else {
+        this.testResults = [];
+      }
     });
   },
   data () {
     return {
       links: [],
+      showInfo: false,
       testResults: [],
       votesData: [ 1, 1 ],
       pieData: null,
