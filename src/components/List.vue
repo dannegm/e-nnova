@@ -22,8 +22,11 @@
               <i class="fa fa-check"></i>
             </span>
           </th>
-          <td>
-           <button v-if="!item.vote"  class="button is-success is-small" @click="vote (item.uuid)">Vote</button>
+          <td v-if="!item.vote">
+           <button class="button is-success is-small" @click="vote (item.uuid)">Vote</button>
+          </td>
+          <td v-if="item.vote">
+           <button class="button is-danger is-small" @click="unvote (item.uuid)">Unvote</button>
           </td>
           <th>{{ item.uuid }}</th>
           <td>{{ item.date }}</td>
@@ -54,6 +57,11 @@ export default {
     vote (uuid) {
       return database.ref (`test/${uuid}`).update ({
         vote: true
+      });
+    },
+    unvote (uuid) {
+      return database.ref (`test/${uuid}`).update ({
+        vote: false
       });
     }
   }

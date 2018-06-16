@@ -43,7 +43,7 @@
         <Card
           title="Vertical Chart"
           subtitle="Prueba de un chart vertical">
-          <VerticalChart :labels="{ type: 'Tipo', name: 'Nombre', progress: 'Progreso' }" total="83" :data='verticalData'></VerticalChart>
+          <VerticalChart :labels="verticalLabels" :total="verticalTotals" :data="verticalData"></VerticalChart>
         </Card>
       </div>
     </section>
@@ -125,6 +125,12 @@ export default {
         this.testResults = [];
       }
     });
+    database.ref ('vertical_test/leaders').on ('value', results => {
+      this.verticalData = results.val ().filter (i => !isEmpty (i));
+    });
+    database.ref ('vertical_test').on ('value', results => {
+      this.verticalTotals = results.val ().totals;
+    });
   },
   data () {
     return {
@@ -137,33 +143,10 @@ export default {
         responsive: true,
         maintainAspectRatio: false
       },
-      verticalData: [
-        {
-          type: 'Líder',
-          label: 'Juan',
-          value: 75,
-        },
-        {
-          type: 'Líder',
-          label: 'Pedro',
-          value: 34,
-        },
-        {
-          type: 'Líder',
-          label: 'Jose',
-          value: 57,
-        },
-        {
-          type: 'Líder',
-          label: 'Miguel',
-          value: 48,
-        },
-        {
-          type: 'Líder',
-          label: 'Oscar',
-          value: 83,
-        },
-      ]
+
+      verticalLabels: { type: 'Tipo', name: 'Nombre', progress: 'Progreso' },
+      verticalTotals: 0,
+      verticalData: null,
     }
   }
 };
