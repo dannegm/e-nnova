@@ -2,13 +2,16 @@ import * as firebase from 'firebase/app'
 import 'firebase/database'
 import 'firebase/storage'
 
+const { log } = console;
+log (process.env);
+
 const credentials = {
-  apiKey: "AIzaSyCOpyCAAyletQNHj7NaeyVAiuHnN2d7otA",
-  authDomain: "e-nnova.firebaseapp.com",
-  databaseURL: "https://e-nnova.firebaseio.com",
-  projectId: "e-nnova",
-  storageBucket: "e-nnova.appspot.com",
-  messagingSenderId: "149489944506"
+  apiKey: process.env.VUE_APP_FIREBASE_API_KEY,
+  authDomain: process.env.VUE_APP_FIREBASE_AUTH_DOMAIN,
+  databaseURL: process.env.VUE_APP_FIREBASE_DATABASE_URL,
+  projectId: process.env.VUE_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.VUE_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.VUE_APP_FIREBASE_MESSAGING_SENDER_ID,
 };
 firebase.initializeApp (credentials);
 const database = firebase.database ();
