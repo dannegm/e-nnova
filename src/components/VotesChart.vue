@@ -10,8 +10,8 @@
     </PieChart>
 
     <div v-if="showInfo">
-      <span class="tag is-success">{{ votes[0] }}</span>&nbsp;
-      <span class="tag is-danger">{{ votes[1] }}</span>
+      <span class="tag is-info">{{ votes[0] }}</span>&nbsp;
+      <span class="tag has-text-white-bis has-background-grey-light">{{ votes[1] }}</span>
     </div>
   </div>
 </template>
@@ -41,7 +41,7 @@ export default {
         datasets: [
           {
             label: 'Totales',
-            backgroundColor: ['#23d160','#ff3860'],
+            backgroundColor: ['#209bee','#b5b5b5'],
             data: votes,
           }
         ]

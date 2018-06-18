@@ -72,7 +72,7 @@ export default {
     database.ref ('test/').on ('value', results => {
       let res = Object.values (results.val () || []).map (i => ({
         uuid: i.uuid,
-        date: moment (i.timestamp).format (),
+        date: moment (i.timestamp).format ('D MMM, HH:mm'),
         vote: i.vote,
       }));
 
