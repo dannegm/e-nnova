@@ -9,22 +9,8 @@
             <Card
               title="Totales"
               subtitle="Gráfica de votantes contra no votantes">
-              
-              <PieChart v-if="showInfo"
-                :chartData="pieData"
-                :options="pieOptions">
-              </PieChart>
-
-              <div v-if="!showInfo" class="notification is-info">
-                Se necesitan datos para visualizar la gráfica
-              </div>
-
-              <div v-if="showInfo">
-                <span class="tag is-success">{{votesData [0]}}</span>&nbsp;
-                <span class="tag is-danger">{{votesData [1]}}</span>
-                <br /><br />
-              </div>
-
+              <VotesChart :votes="votes"></VotesChart>
+              <br>
               <button class="button" @click="storeTest">Añadir registro</button>
             </Card>
           </div>
@@ -32,7 +18,7 @@
             <Card
               title="Prueba firebase"
               subtitle="Prueba de realtime de firebase">
-              <List :items="testResults"></List>
+              <List :items="testItems"></List>
             </Card>
           </div>
         </div>
@@ -51,28 +37,17 @@
 </template>
 
 <script>
-import Vue from 'vue';
 
-import { database } from '@/services/firebase';
 import uuid from 'uuid/v1';
 import moment from 'moment';
 import { isEmpty } from 'lodash';
-
-import { Pie, mixins } from 'vue-chartjs';
+import { database } from '@/services/firebase';
 
 import AppMenu from '@/components/AppMenu.vue';
 import Card from '@/components/Card.vue';
+import VotesChart from '@/components/VotesChart.vue';
 import VerticalChart from '@/components/VerticalChart.vue';
 import List from '@/components/List.vue';
-
-Vue.component ('PieChart', {
-  props: ['options'],
-  extends: Pie,
-  mixins: [ mixins.reactiveProp ],
-  mounted () {
-    this.renderChart (this.chartData, this.options);
-  }
-});
 
 export default {
   name: 'app',
@@ -81,6 +56,7 @@ export default {
     Card,
     List,
     VerticalChart,
+    VotesChart,
   },
   methods: {
     async storeTest () {
@@ -90,41 +66,24 @@ export default {
         vote: false,
       };
       await database.ref (`test/${data.uuid}`).set (data);
-      this.fillChart ();
     },
-    fillChart () {
-      this.pieData = {
-        labels: ['Han votado', 'No han votado'],
-        datasets: [
-          {
-            label: 'Totales',
-            backgroundColor: ['#23d160','#ff3860'],
-            data: this.votesData,
-          }
-        ]
-      }
-    }
   },
   mounted () {
     database.ref ('test/').on ('value', results => {
-      this.showInfo = !isEmpty (results.val ());
+      let res = Object.values (results.val () || []).map (i => ({
+        uuid: i.uuid,
+        date: moment (i.timestamp).format (),
+        vote: i.vote,
+      }));
 
-      if (this.showInfo) {
-        let res = Object.values (results.val ()).map (i => ({
-          uuid: i.uuid,
-          date: moment (i.timestamp).format (),
-          vote: i.vote,
-        }));
+      this.testItems = res;
+      this.votes = [
+        res.filter (i => i.vote).length,
+        res.filter (i => !i.vote).length
+      ];
 
-        const voted = res.filter (i => i.vote);
-        const unvoted = res.filter (i => !i.vote);
-        this.votesData = [ voted.length, unvoted.length ];
-        this.fillChart ();
-        this.testResults = res;
-      } else {
-        this.testResults = [];
-      }
     });
+
     database.ref ('vertical_test/leaders').on ('value', results => {
       this.verticalData = results.val ().filter (i => !isEmpty (i));
     });
@@ -135,14 +94,8 @@ export default {
   data () {
     return {
       links: [],
-      showInfo: false,
-      testResults: [],
-      votesData: [ 1, 1 ],
-      pieData: null,
-      pieOptions: {
-        responsive: true,
-        maintainAspectRatio: false
-      },
+      testItems: [],
+      votes: [0, 0],
 
       verticalLabels: { type: 'Tipo', name: 'Nombre', progress: 'Progreso' },
       verticalTotals: 0,

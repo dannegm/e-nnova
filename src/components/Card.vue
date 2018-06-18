@@ -17,5 +17,5 @@
 export default {
   name: 'Card',
   props: ['title', 'subtitle']
-}
+};
 </script>

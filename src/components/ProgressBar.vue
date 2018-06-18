@@ -6,5 +6,5 @@
 export default {
   name: 'ProgressBar',
   props: ['percent']
-}
+};
 </script>

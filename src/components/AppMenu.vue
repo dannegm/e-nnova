@@ -16,5 +16,5 @@
 export default {
   name: 'AppMenu',
   props: ['links']
-}
+};
 </script>

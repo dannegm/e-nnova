@@ -1,9 +1,6 @@
-import * as firebase from 'firebase/app'
-import 'firebase/database'
-import 'firebase/storage'
-
-const { log } = console;
-log (process.env);
+import firebase from 'firebase/app'
+import 'firebase/database';
+import 'firebase/storage';
 
 const credentials = {
   apiKey: process.env.VUE_APP_FIREBASE_API_KEY,
