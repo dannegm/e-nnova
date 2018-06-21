@@ -45,15 +45,35 @@
             </li>
           </ul>
         </nav>
-
       </div>
 
+      <br />
+      <div class="container">
+        <div class="columns">
+          <div class="column is-one-third">
+            <Card
+              title="Secciones"
+              subtitle="Gráfica de votantes contra no votantes">
+              <VotesChart :votes="votesPercents"></VotesChart>
+            </Card>
+          </div>
+
+          <div class="column">
+            <Card
+              title="Detalle"
+              subtitle="Listado de votantes">
+              <VerticalChart :labels="verticalLabels" :total="verticalTotals" :data="verticalData"></VerticalChart>
+            </Card>
+          </div>
+        </div>
+      </div>
     </section>
   </div>
 </template>
 
 <script>
 
+import { reduce } from 'lodash';
 import { database } from '@/services/firebase';
 
 import AppMenu from '@/components/AppMenu.vue';
@@ -79,6 +99,8 @@ export default {
         i.label = `Sección ${i.name}`;
         return i;
       });
+      this.actual = 'district';
+      console.log (test);
     },
 
     setSection (section) {
@@ -88,11 +110,13 @@ export default {
         i.label = `C: ${i.name}`;
         return i;
       });
+      this.actual = 'section';
     },
     resetSection () {
       this.sectionSelected = null;
       this.managerSelected = null;
       this.leaderSelected = null;
+      this.actual = 'district';
     },
 
     setManager (manager) {
@@ -102,17 +126,21 @@ export default {
         i.label = `L: ${i.name}`;
         return i;
       });
+      this.actual = 'manager';
     },
     resetManager () {
       this.managerSelected = null;
       this.leaderSelected = null;
+      this.actual = 'section';
     },
 
     setLeader (leader) {
       this.leaderSelected = leader;
+      this.actual = 'leader';
     },
     resetLeader () {
       this.leaderSelected = null;
+      this.actual = 'manager';
     },
   },
   mounted () {
@@ -129,7 +157,10 @@ export default {
   data () {
     return {
       links: [],
+      actual: 'district',
       votes: {},
+      votesPercents: [0, 100],
+
       districs: [],
       districSelected: null,
 
@@ -141,6 +172,11 @@ export default {
 
       leaders: [],
       leaderSelected: null,
+
+      votesData: [1, 1],
+      verticalLabels: { type: 'Tipo', name: 'Nombre', progress: 'Progreso' },
+      verticalTotals: 0,
+      verticalData: null,
     }
   }
 };

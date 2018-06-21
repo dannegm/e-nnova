@@ -9,9 +9,10 @@
       :options="pieOptions">
     </PieChart>
 
-    <div v-if="showInfo">
-      <span class="tag is-info">{{ votes[0] }}</span>&nbsp;
-      <span class="tag has-text-white-bis has-background-grey-light">{{ votes[1] }}</span>
+    <div v-if="showInfo" class="has-text-centered">
+      <br />
+      <span class="tag is-info">El  <b>&nbsp;{{votes[0]}}%&nbsp;</b>  ha votado</span>&nbsp;
+      <span class="tag has-text-white-bis has-background-grey-light">El <b>&nbsp;{{votes[1]}}%&nbsp;</b> aún no ha votado</span>
     </div>
   </div>
 </template>
@@ -19,8 +20,6 @@
 <script>
 import Vue from 'vue';
 import { Pie, mixins } from 'vue-chartjs';
-import { isEmpty } from 'lodash';
-import { database } from '@/services/firebase';
 
 Vue.component ('PieChart', {
   props: ['options'],
@@ -34,6 +33,10 @@ Vue.component ('PieChart', {
 export default {
   name: 'VotesChart',
   props: ['votes'],
+  mounted () {
+    this.showInfo = !!(this.votes [0] || this.votes [1]);
+    this.fillChart (this.votes);
+  },
   methods: {
     fillChart (votes) {
       this.pieData = {
@@ -51,7 +54,7 @@ export default {
   watch: {
     votes: {
       deep: true,
-      handler: function (val, oldVal) {
+      handler: function (val) {
         this.showInfo = !!(val [0] || val [1]);
         this.fillChart (val);
       },
