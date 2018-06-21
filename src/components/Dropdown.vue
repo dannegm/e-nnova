@@ -3,7 +3,9 @@
     <div class="control">
       <div class="dropdown" :class="{ 'is-active': isActive }">
         <div class="dropdown-trigger">
-          <button class="button"
+          <button
+            class="button"
+            :disabled="disabled"
             @click="isActive = !isActive">
             <span>{{selected.label}}</span>
             <span class="icon is-small">
@@ -50,6 +52,7 @@ export default {
   props: [
     'placeholder',
     'items',
+    'disabled',
     'selectFirst',
     'canReset',
     'onSelected',

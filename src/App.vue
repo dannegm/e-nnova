@@ -10,6 +10,7 @@
               <Dropdown
                 :items="districs"
                 :selectFirst="true"
+                :disabled="!!sectionSelected"
                 :onSelected="setDistrict">
                 </Dropdown>
             </li>
@@ -18,6 +19,7 @@
                 :placeholder="{ label: 'Selecciona una sección'}"
                 :items="sections"
                 :canReset="true"
+                :disabled="!!managerSelected"
                 :onSelected="setSection"
                 :onReset="resetSection">
                 </Dropdown>
@@ -27,6 +29,7 @@
                 :placeholder="{ label: 'Selecciona un coordinador'}"
                 :items="managers"
                 :canReset="true"
+                :disabled="!!leaderSelected"
                 :onSelected="setManager"
                 :onReset="resetManager">
                 </Dropdown>
@@ -88,6 +91,8 @@ export default {
     },
     resetSection () {
       this.sectionSelected = null;
+      this.managerSelected = null;
+      this.leaderSelected = null;
     },
 
     setManager (manager) {
@@ -100,6 +105,7 @@ export default {
     },
     resetManager () {
       this.managerSelected = null;
+      this.leaderSelected = null;
     },
 
     setLeader (leader) {
