@@ -11,22 +11,6 @@
     <tbody>
       <tr v-for="item in data">
         <td>
-          <div class="field has-addons">
-            <p class="control">
-              <button class="button is-small" @click="minus (item.index, item.value)">
-                <span class="icon is-small">
-                  <i class="fas fa-minus"></i>
-                </span>
-              </button>
-            </p>
-            <p class="control">
-              <button class="button is-small" @click="plus (item.index, item.value)">
-                <span class="icon is-small">
-                  <i class="fas fa-plus"></i>
-                </span>
-              </button>
-            </p>
-          </div>
         </td>
         <td width="10%">{{ item.type }}</td>
         <td>{{ item.label }}</td>

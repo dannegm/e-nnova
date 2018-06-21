@@ -4,106 +4,145 @@
 
     <section class="section">
       <div class="container">
-        <div class="columns">
-          <div class="column is-two-fifths">
-            <Card
-              title="Totales"
-              subtitle="Gráfica de votantes contra no votantes">
-              <VotesChart :votes="votes"></VotesChart>
-              <br>
-              <button class="button" @click="storeTest">Añadir registro</button>
-            </Card>
-          </div>
-          <div class="column">
-            <Card
-              title="Prueba firebase"
-              subtitle="Prueba de realtime de firebase">
-              <List :items="testItems"></List>
-            </Card>
-          </div>
-        </div>
+        <nav class="breadcrumb has-arrow-separator" aria-label="breadcrumbs">
+          <ul>
+            <li>
+              <Dropdown
+                :items="districs"
+                :selectFirst="true"
+                :onSelected="setDistrict">
+                </Dropdown>
+            </li>
+            <li>
+              <Dropdown
+                :placeholder="{ label: 'Selecciona una sección'}"
+                :items="sections"
+                :canReset="true"
+                :onSelected="setSection"
+                :onReset="resetSection">
+                </Dropdown>
+            </li>
+            <li v-if="!!sectionSelected">
+              <Dropdown
+                :placeholder="{ label: 'Selecciona un coordinador'}"
+                :items="managers"
+                :canReset="true"
+                :onSelected="setManager"
+                :onReset="resetManager">
+                </Dropdown>
+            </li>
+            <li v-if="!!sectionSelected && !!managerSelected">
+              <Dropdown
+                :placeholder="{ label: 'Selecciona un líder'}"
+                :items="leaders"
+                :canReset="true"
+                :onSelected="setLeader"
+                :onReset="resetLeader">
+                </Dropdown>
+            </li>
+          </ul>
+        </nav>
+
       </div>
 
-      <br />
-      <div class="container">
-        <Card
-          title="Vertical Chart"
-          subtitle="Prueba de un chart vertical">
-          <VerticalChart :labels="verticalLabels" :total="verticalTotals" :data="verticalData"></VerticalChart>
-        </Card>
-      </div>
     </section>
   </div>
 </template>
 
 <script>
 
-import uuid from 'uuid/v1';
-import moment from 'moment';
-import { isEmpty } from 'lodash';
 import { database } from '@/services/firebase';
 
 import AppMenu from '@/components/AppMenu.vue';
 import Card from '@/components/Card.vue';
+import Dropdown from '@/components/Dropdown.vue';
 import VotesChart from '@/components/VotesChart.vue';
 import VerticalChart from '@/components/VerticalChart.vue';
-import List from '@/components/List.vue';
 
 export default {
   name: 'app',
   components: {
     AppMenu,
     Card,
-    List,
+    Dropdown,
     VerticalChart,
     VotesChart,
   },
   methods: {
-    async storeTest () {
-      const data = {
-        uuid: uuid (),
-        timestamp: Date.now (),
-        vote: false,
-      };
-      await database.ref (`test/${data.uuid}`).set (data);
+    setDistrict (district) {
+      this.districSelected = district;
+      this.sections = Object.values (district.sections).map (i => {
+        i.key = i.name;
+        i.label = `Sección ${i.name}`;
+        return i;
+      });
+    },
+
+    setSection (section) {
+      this.sectionSelected = section;
+      this.managers = Object.values (section.managers).map (i => {
+        i.key = i.name;
+        i.label = `C: ${i.name}`;
+        return i;
+      });
+    },
+    resetSection () {
+      this.sectionSelected = null;
+    },
+
+    setManager (manager) {
+      this.managerSelected = manager;
+      this.leaders = Object.values (manager.leaders).map (i => {
+        i.key = i.name;
+        i.label = `L: ${i.name}`;
+        return i;
+      });
+    },
+    resetManager () {
+      this.managerSelected = null;
+    },
+
+    setLeader (leader) {
+      this.leaderSelected = leader;
+    },
+    resetLeader () {
+      this.leaderSelected = null;
     },
   },
   mounted () {
-    database.ref ('test/').on ('value', results => {
-      let res = Object.values (results.val () || []).map (i => ({
-        uuid: i.uuid,
-        date: moment (i.timestamp).format ('D MMM, HH:mm'),
-        vote: i.vote,
-      }));
-
-      this.testItems = res;
-      this.votes = [
-        res.filter (i => i.vote).length,
-        res.filter (i => !i.vote).length
-      ];
-
-    });
-
-    database.ref ('vertical_test/leaders').on ('value', results => {
-      this.verticalData = results.val ().filter (i => !isEmpty (i));
-    });
-    database.ref ('vertical_test').on ('value', results => {
-      this.verticalTotals = results.val ().totals;
+    database.ref ('votes/districts').on ('value', results => {
+      this.votes = results.val ();
+      this.districs = Object.values (this.votes).map (i => {
+        i.key = i.name;
+        i.label = `Distrito ${i.name}`;
+        return i;
+      });
+      this.setDistrict (this.districs [0]);
     });
   },
   data () {
     return {
       links: [],
-      testItems: [],
-      votes: [0, 0],
+      votes: {},
+      districs: [],
+      districSelected: null,
 
-      verticalLabels: { type: 'Tipo', name: 'Nombre', progress: 'Progreso' },
-      verticalTotals: 0,
-      verticalData: null,
+      sections: [],
+      sectionSelected: null,
+
+      managers: [],
+      managerSelected: null,
+
+      leaders: [],
+      leaderSelected: null,
     }
   }
 };
 </script>
 
-<style>
+<style scoped>
+.breadcrumb li+li::before {
+  margin: 0px 10px !important;
+  font-size: 1.6em !important;
+}
 </style>
