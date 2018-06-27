@@ -1,69 +1,35 @@
 <template>
   <div>
-    <table v-if="items.length > 0" class="table">
+    <table v-if="data.length > 0" class="table">
       <thead>
         <tr>
-          <th>Vote (?)</th>
           <th></th>
-          <th>UUID</th>
-          <th>Time</th>
-          <th></th>
+          <th>{{ labels.type }}</th>
+          <th>{{ labels.name }}</th>
+          <th colspan="3"></th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="item in items">
-          <th v-if="!item.vote">
-            <span class="has-text-danger">
-              <i class="fa fa-times"></i>
-            </span>
-          </th>
-          <th v-if="item.vote">
-            <span class="has-text-success">
-              <i class="fa fa-check"></i>
-            </span>
-          </th>
-          <td v-if="!item.vote">
-           <button class="button is-success is-small" @click="vote (item.uuid)">Vote</button>
-          </td>
-          <td v-if="item.vote">
-           <button class="button is-danger is-small" @click="unvote (item.uuid)">Unvote</button>
-          </td>
-          <th>{{ item.uuid }}</th>
-          <td>{{ item.date }}</td>
-          <td>
-           <button class="button is-danger is-small" @click="deleteItem (item.uuid)">
-             <i class="fa fa-trash"></i>
-           </button>
-          </td>
-        </tr>
+        <ListItem
+          v-for="item in data"
+          :item="item">
+        </ListItem>
       </tbody>
     </table>
 
-    <div v-if="items.length == 0" class="notification is-info">
+    <div v-else class="notification is-info">
       No existen registros aún
     </div>
   </div>
 </template>
 
 <script>
-import { database } from '@/services/firebase';
+import ListItem from './ListItem.vue';
 export default {
   name: 'List',
-  props: ['items', 'isEmpty'],
-  methods: {
-    deleteItem (uuid) {
-      return database.ref (`test/${uuid}`).remove ();
-    },
-    vote (uuid) {
-      return database.ref (`test/${uuid}`).update ({
-        vote: true
-      });
-    },
-    unvote (uuid) {
-      return database.ref (`test/${uuid}`).update ({
-        vote: false
-      });
-    }
-  }
+  props: ['data', 'labels'],
+  components: {
+    ListItem,
+  },
 };
 </script>

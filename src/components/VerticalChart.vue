@@ -1,27 +1,31 @@
-<template id="vertical-chart">
-  <table class="table">
-    <thead>
-      <tr>
-        <th></th>
-        <th>{{ labels.type }}</th>
-        <th>{{ labels.name }}</th>
-        <th colspan="3">{{ labels.progress }}</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="item in data">
-        <td>
-        </td>
-        <td width="10%">{{ item.type }}</td>
-        <td>{{ item.label }}</td>
-        <td class="vertical-center" width="25%">
-          <ProgressBar :percent="parseInt (item.value / total * 100)"></ProgressBar>
-        </td>
-        <td width="15%"><b>{{ item.value }}</b> / {{ total }}</td>
-        <td width="10%">{{ parseInt (item.value / total * 100) }}%</td>
-      </tr>
-    </tbody>
-  </table>
+<template>
+  <div>
+    <table v-if="data && data.length > 0" class="table">
+      <thead>
+        <tr>
+          <th>{{ labels.type }}</th>
+          <th>{{ labels.name }}</th>
+          <th colspan="3">{{ labels.progress }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="item in data">
+          <td width="10%">{{ item.type }}</td>
+          <td>{{ item.label }}</td>
+
+          <td class="vertical-center" width="25%">
+            <ProgressBar :percent="parseInt ((item.partial / item.total) * 100)"></ProgressBar>
+          </td>
+          <td width="15%"><b>{{ item.partial }}</b> / {{ item.total }}</td>
+          <td width="10%">{{ parseInt ((item.partial / item.total) * 100) }}%</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div v-else class="notification is-info">
+      No existen registros aún
+    </div>
+  </div>
 </template>
 
 <script>
@@ -32,20 +36,8 @@ export default {
   components: {
     ProgressBar,
   },
-  props: ['labels', 'total', 'data'],
+  props: ['labels', 'data'],
   methods: {
-    plus (index, actual) {
-      actual++;
-      return database.ref (`vertical_test/leaders/${index}`).update ({
-        value: actual
-      });
-    },
-    minus (index, actual) {
-      actual--;
-      return database.ref (`vertical_test/leaders/${index}`).update ({
-        value: actual
-      });
-    }
   }
 };
 </script>

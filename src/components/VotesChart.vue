@@ -9,10 +9,16 @@
       :options="pieOptions">
     </PieChart>
 
-    <div v-if="showInfo" class="has-text-centered">
-      <br />
-      <span class="tag is-info">El  <b>&nbsp;{{votes[0]}}%&nbsp;</b>  ha votado</span>&nbsp;
-      <span class="tag has-text-white-bis has-background-grey-light">El <b>&nbsp;{{votes[1]}}%&nbsp;</b> aún no ha votado</span>
+    <br />
+    <div v-if="showInfo" class="columns">
+      <div class="column is-half">
+        <h1 class="has-text-info">{{percent (votes[0])}}%</h1>
+        <p><b>{{votes [0]}}</b> de <b>{{total}}</b>, han votado.</p>
+      </div>
+      <div class="column is-half">
+        <h1 class="has-text-grey">{{percent (votes[1])}}%</h1>
+        <p><b>{{votes [1]}}</b> Faltan por votar</p>
+      </div>
     </div>
   </div>
 </template>
@@ -38,7 +44,12 @@ export default {
     this.fillChart (this.votes);
   },
   methods: {
+    percent (partial) {
+      const percent = parseInt ((partial / this.total) * 100)
+      return isNaN (percent) ? 0 : percent;
+    },
     fillChart (votes) {
+      this.showInfo = !!(votes [0] || votes [1]);
       this.pieData = {
         labels: ['Han votado', 'No han votado'],
         datasets: [
@@ -57,11 +68,13 @@ export default {
       handler: function (val) {
         this.showInfo = !!(val [0] || val [1]);
         this.fillChart (val);
+        this.total = val [0] + val [1];
       },
     },
   },
   data () {
     return {
+      total: 0,
       showInfo: false,
       pieData: null,
       pieOptions: {
